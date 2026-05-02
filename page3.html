@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For You — The Question</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #fdf6ee;
+      --blush: #e8b4a0;
+      --deep: #2c1a12;
+      --mid: #7a4f3a;
+      --accent: #c97d5e;
+    }
+
+    body {
+      background-color: var(--cream);
+      color: var(--deep);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      bottom: -200px; left: -200px;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,180,160,0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .container {
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ✏️ EDIT: Small label at top of page 3 */
+    .eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--blush);
+      margin-bottom: 2rem;
+    }
+
+    /* ✏️ EDIT: The big question on page 3 */
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2.5rem, 7vw, 4.5rem);
+      line-height: 1.1;
+      margin-bottom: 0.8rem;
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    /* ✏️ EDIT: The small subtext under the question */
+    .sub {
+      font-size: 0.9rem;
+      color: var(--mid);
+      margin-bottom: 3rem;
+    }
+
+    .choices {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .btn {
+      padding: 0.9rem 2.8rem;
+      border-radius: 100px;
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid;
+    }
+
+    /* ✏️ EDIT: The YES button text is in the HTML below */
+    .btn-yes {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .btn-yes:hover {
+      background: #b5694a;
+      border-color: #b5694a;
+      transform: scale(1.04);
+    }
+
+    /* ✏️ EDIT: The NO button text is in the HTML below */
+    .btn-no {
+      background: transparent;
+      border-color: var(--blush);
+      color: var(--mid);
+    }
+    .btn-no:hover {
+      background: #f5e4da;
+    }
+
+    /* Response panels — shown after clicking */
+    .response {
+      display: none;
+      animation: fadeUp 0.8s ease both;
+    }
+    .response.visible {
+      display: block;
+    }
+
+    .response-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    /* ✏️ EDIT: The heading shown when they click YES */
+    .response-yes h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: var(--deep);
+      margin-bottom: 0.8rem;
+    }
+    .response-yes h2 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    /* ✏️ EDIT: The paragraph shown when they click YES */
+    .response-yes p {
+      font-size: 0.95rem;
+      color: var(--mid);
+      line-height: 1.8;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    /* ✏️ EDIT: The heading shown when they click NO */
+    .response-no h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(1.8rem, 4.5vw, 2.5rem);
+      color: var(--mid);
+      margin-bottom: 0.8rem;
+    }
+
+    /* ✏️ EDIT: The paragraph shown when they click NO */
+    .response-no p {
+      font-size: 0.9rem;
+      color: var(--mid);
+      line-height: 1.8;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    /* Confetti canvas */
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="container" id="question-section">
+
+    <!-- ✏️ EDIT: Small label -->
+    <p class="eyebrow">the big question</p>
+
+    <!-- ✏️ EDIT: The main question heading — keep <em> tags around italic parts -->
+    <h1>Will you go<br>on a <em>date</em> with me?</h1>
+
+    <!-- ✏️ EDIT: Subtext under the question -->
+    <p class="sub">No pressure. Just be honest with me.</p>
+
+    <div class="choices">
+      <!-- ✏️ EDIT: Button labels -->
+      <button class="btn btn-yes" onclick="choose('yes')">Yes ♡</button>
+      <button class="btn btn-no" onclick="choose('no')">No</button>
+    </div>
+
+  </div>
+
+  <!-- ✏️ EDIT: YES response — shown when they click Yes -->
+  <div class="container response response-yes" id="response-yes">
+    <span class="response-icon">🌷</span>
+    <h2>You just made me<br>the <em>happiest</em> person.</h2>
+    <!-- ✏️ EDIT: What you want to say after they say yes -->
+    <p>
+      I'm already smiling so big right now. 
+      I'll reach out soon to plan something special — 
+      just for us. Thank you for saying yes.
+    </p>
+  </div>
+
+  <!-- ✏️ EDIT: NO response — shown when they click No -->
+  <div class="container response response-no" id="response-no">
+    <span class="response-icon">🌿</span>
+    <h2>That's okay.</h2>
+    <!-- ✏️ EDIT: What you want to say after they say no -->
+    <p>
+      Thank you for being honest. It took courage for me to ask, 
+      and I'm glad I did. I hope we can still be friends — 
+      you're someone worth knowing.
+    </p>
+  </div>
+
+  <script>
+    function choose(answer) {
+      // Hide the question
+      document.getElementById('question-section').style.display = 'none';
+
+      if (answer === 'yes') {
+        document.getElementById('response-yes').classList.add('visible');
+        launchConfetti();
+      } else {
+        document.getElementById('response-no').classList.add('visible');
+      }
+    }
+
+    // Simple confetti for the yes answer
+    function launchConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const pieces = [];
+      const colors = ['#e8b4a0', '#c97d5e', '#f5cfc3', '#fdf6ee', '#b5694a', '#d4a090'];
+
+      for (let i = 0; i < 120; i++) {
+        pieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * -canvas.height,
+          w: Math.random() * 8 + 4,
+          h: Math.random() * 4 + 2,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rot: Math.random() * 360,
+          speed: Math.random() * 3 + 1.5,
+          drift: Math.random() * 2 - 1,
+          spin: Math.random() * 4 - 2
+        });
+      }
+
+      let frame;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot * Math.PI / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+          p.y += p.speed;
+          p.x += p.drift;
+          p.rot += p.spin;
+        });
+        if (pieces.some(p => p.y < canvas.height + 20)) {
+          frame = requestAnimationFrame(draw);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+
+      draw();
+      setTimeout(() => { cancelAnimationFrame(frame); ctx.clearRect(0, 0, canvas.width, canvas.height); }, 5000);
+    }
+  </script>
+
+</body>
+</html>
