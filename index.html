@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For You</title>
+  <!-- ✏️ EDIT: Change the title above to whatever you want in the browser tab -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --cream:#fdf6ee; --blush:#e8b4a0; --deep:#2c1a12; --mid:#7a4f3a; --accent:#c97d5e; }
+
+    body {
+      background-color: var(--cream);
+      color: var(--deep);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before, body::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,180,160,0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    body::before { width:600px; height:600px; top:-150px; right:-150px; }
+    body::after  { width:500px; height:500px; bottom:-100px; left:-100px; }
+
+    .container {
+      text-align: center;
+      padding: 2rem;
+      max-width: 600px;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 1.2s ease both;
+    }
+
+    .eyebrow {
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      animation: fadeUp 1.2s ease 0.1s both;
+    }
+
+    /* ✏️ EDIT: Big heading on page 1 */
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 1.2s ease 0.2s both;
+    }
+    h1 em { font-style: italic; color: var(--accent); }
+
+    /* ✏️ EDIT: Subtitle paragraph on page 1 */
+    .subtitle {
+      font-size: 1rem;
+      color: var(--mid);
+      line-height: 1.8;
+      max-width: 420px;
+      margin: 0 auto 2.5rem;
+      animation: fadeUp 1.2s ease 0.35s both;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 1.2s ease 0.5s both;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.85rem 2.8rem;
+      border: 1px solid var(--blush);
+      color: var(--deep);
+      text-decoration: none;
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border-radius: 100px;
+      background: transparent;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* Floating circles */
+    .petal {
+      position: fixed;
+      border-radius: 50%;
+      background: var(--blush);
+      opacity: 0;
+      animation: float linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+      0%   { transform: translateY(100vh); opacity: 0; }
+      8%   { opacity: 0.45; }
+      92%  { opacity: 0.45; }
+      100% { transform: translateY(-10vh); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating circles — faster speeds (6s–9s), no delay so they start immediately -->
+  <div class="petal" style="left:8%;  width:5px; height:5px; animation-duration:7s;  animation-delay:0s;"></div>
+  <div class="petal" style="left:22%; width:8px; height:8px; animation-duration:9s;  animation-delay:0s;"></div>
+  <div class="petal" style="left:38%; width:4px; height:4px; animation-duration:6s;  animation-delay:0s;"></div>
+  <div class="petal" style="left:55%; width:7px; height:7px; animation-duration:8s;  animation-delay:0s;"></div>
+  <div class="petal" style="left:70%; width:5px; height:5px; animation-duration:7s;  animation-delay:0s;"></div>
+  <div class="petal" style="left:85%; width:6px; height:6px; animation-duration:6s;  animation-delay:0s;"></div>
+  <div class="petal" style="left:15%; width:4px; height:4px; animation-duration:8s;  animation-delay:2s;"></div>
+  <div class="petal" style="left:48%; width:6px; height:6px; animation-duration:7s;  animation-delay:3s;"></div>
+  <div class="petal" style="left:92%; width:5px; height:5px; animation-duration:9s;  animation-delay:1s;"></div>
+
+  <div class="container">
+    <!-- ✏️ EDIT: Small label above the heading -->
+    <p class="eyebrow">a little something for you</p>
+
+    <!-- ✏️ EDIT: Big heading — keep <em> tags for the italic colored word -->
+    <h1>Hi,<br><em>gorgeous.</em></h1>
+
+    <!-- ✏️ EDIT: Subtitle paragraph -->
+    <p class="subtitle">
+      There's something I've been meaning to tell you.
+      Something that's been on my mind for a while now.
+      I wanted to say it in the best way I could.
+    </p>
+
+    <!-- ✏️ EDIT: Button text -->
+    <div class="btn-row">
+      <a href="page2.html" class="btn">Keep reading &rarr;</a>
+    </div>
+  </div>
+
+</body>
+</html>

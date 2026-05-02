@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For You — A Question</title>
+  <!-- ✏️ EDIT: Change the browser tab title above if you want -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --cream:#fdf6ee; --blush:#e8b4a0; --deep:#2c1a12; --mid:#7a4f3a; --accent:#c97d5e; }
+
+    body {
+      background-color: var(--cream);
+      color: var(--deep);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px; right: -200px;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,180,160,0.2) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 1s ease both;
+    }
+
+    /* ✏️ EDIT: Small label at the top */
+    .eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--blush);
+      margin-bottom: 2rem;
+    }
+
+    /* ✏️ EDIT: The big question heading on this page */
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+    h1 em { font-style: italic; color: var(--accent); }
+
+    /* ✏️ EDIT: The smaller text under the big question */
+    .sub {
+      font-size: 1rem;
+      color: var(--mid);
+      line-height: 1.8;
+      max-width: 400px;
+      margin: 0 auto 3rem;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.85rem 2.8rem;
+      border: 1px solid var(--blush);
+      color: var(--deep);
+      text-decoration: none;
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border-radius: 100px;
+      background: transparent;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-back { color: var(--mid); font-size: 0.75rem; }
+
+    .petal {
+      position: fixed;
+      border-radius: 50%;
+      background: var(--blush);
+      opacity: 0;
+      animation: float linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+      0%   { transform: translateY(100vh); opacity: 0; }
+      8%   { opacity: 0.45; }
+      92%  { opacity: 0.45; }
+      100% { transform: translateY(-10vh); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating circles -->
+  <div class="petal" style="left:8%;  width:5px; height:5px; animation-duration:7s;  animation-delay:0s;"></div>
+  <div class="petal" style="left:22%; width:8px; height:8px; animation-duration:9s;  animation-delay:0s;"></div>
+  <div class="petal" style="left:38%; width:4px; height:4px; animation-duration:6s;  animation-delay:0s;"></div>
+  <div class="petal" style="left:55%; width:7px; height:7px; animation-duration:8s;  animation-delay:0s;"></div>
+  <div class="petal" style="left:70%; width:5px; height:5px; animation-duration:7s;  animation-delay:0s;"></div>
+  <div class="petal" style="left:85%; width:6px; height:6px; animation-duration:6s;  animation-delay:0s;"></div>
+  <div class="petal" style="left:15%; width:4px; height:4px; animation-duration:8s;  animation-delay:2s;"></div>
+  <div class="petal" style="left:48%; width:6px; height:6px; animation-duration:7s;  animation-delay:3s;"></div>
+  <div class="petal" style="left:92%; width:5px; height:5px; animation-duration:9s;  animation-delay:1s;"></div>
+
+  <div class="page">
+
+    <!-- ✏️ EDIT: Small label at the top -->
+    <p class="eyebrow">before we go further</p>
+
+    <!-- ✏️ EDIT: The big question — keep <em> tags around the italic word -->
+    <h1>Do I ever cross<br>your <em>mind?</em></h1>
+
+    <!-- ✏️ EDIT: Smaller supporting text under the question -->
+    <p class="sub">
+      Because you cross mine — more than I expected,
+      more than I've admitted, more than you probably know.
+      I just thought you should know that before we continue.
+    </p>
+
+    <!-- ✏️ EDIT: Button text -->
+    <div class="btn-row">
+      <a href="index.html" class="btn btn-back">&larr; Back</a>
+      <a href="page3.html" class="btn">Keep reading &rarr;</a>
+    </div>
+
+  </div>
+</body>
+</html>
