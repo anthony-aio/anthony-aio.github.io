@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Question</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+  <!-- EmailJS — sends you a notification email when they answer -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --cream:#fdf6ee; --blush:#e8b4a0; --deep:#2c1a12; --mid:#7a4f3a; --accent:#c97d5e; }
@@ -43,16 +45,6 @@
       animation: fadeUp 1s ease both;
     }
 
-    /* ✏️ EDIT: Small label at top of the final page */
-    .eyebrow {
-      font-size: 0.7rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--blush);
-      margin-bottom: 2rem;
-    }
-
-    /* ✏️ EDIT: The big question */
     h1 {
       font-family: 'Cormorant Garamond', serif;
       font-weight: 300;
@@ -62,10 +54,17 @@
     }
     h1 em { font-style: italic; color: var(--accent); }
 
-    /* ✏️ EDIT: Subtext under the question */
     .sub { font-size: 0.9rem; color: var(--mid); margin-bottom: 3rem; }
 
-    .choices { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom: 1.5rem; }
+    .choices {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      min-height: 60px;
+      align-items: center;
+    }
 
     .btn {
       padding: 0.9rem 2.8rem;
@@ -82,21 +81,24 @@
       display: inline-block;
     }
 
-    /* ✏️ EDIT: YES button text is in the HTML below */
+    /* ✏️ EDIT: YES button */
     .btn-yes {
       background: var(--accent);
       border-color: var(--accent);
       color: #fff;
+      transition: transform 0.4s ease, font-size 0.4s ease, padding 0.4s ease;
     }
-    .btn-yes:hover { background: #b5694a; border-color: #b5694a; transform: scale(1.04); }
+    .btn-yes:hover { background: #b5694a; border-color: #b5694a; }
 
-    /* ✏️ EDIT: NO button text is in the HTML below */
+    /* ✏️ EDIT: NO button */
     .btn-no {
       background: transparent;
       border-color: var(--blush);
       color: var(--mid);
+      position: fixed; /* fixed so it can roam the whole screen */
+      transition: font-size 0.4s ease, padding 0.4s ease, opacity 0.4s ease;
+      z-index: 10;
     }
-    .btn-no:hover { background: #f5e4da; }
 
     .back-row { margin-top: 1rem; }
     .btn-back {
@@ -105,14 +107,25 @@
       color: var(--mid);
       font-size: 0.75rem;
       padding: 0.6rem 1.5rem;
+      cursor: pointer;
     }
-    .btn-back:hover { background: transparent; border-color: var(--blush); color: var(--deep); }
+    .btn-back:hover { border-color: var(--blush); color: var(--deep); }
 
     /* Response panels */
     .response { display: none; animation: fadeUp 0.8s ease both; }
     .response.visible { display: block; }
 
-    .response-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+    /* ✏️ EDIT: GIF size on the response screens */
+    .response-gif {
+      width: 220px;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 20px;
+      margin-bottom: 1.5rem;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
     /* ✏️ EDIT: YES response heading */
     .response-yes h2 {
@@ -123,8 +136,6 @@
       margin-bottom: 0.8rem;
     }
     .response-yes h2 em { font-style: italic; color: var(--accent); }
-
-    /* ✏️ EDIT: YES response paragraph */
     .response-yes p { font-size: 0.95rem; color: var(--mid); line-height: 1.8; max-width: 380px; margin: 0 auto; }
 
     /* ✏️ EDIT: NO response heading */
@@ -135,8 +146,6 @@
       color: var(--mid);
       margin-bottom: 0.8rem;
     }
-
-    /* ✏️ EDIT: NO response paragraph */
     .response-no p { font-size: 0.9rem; color: var(--mid); line-height: 1.8; max-width: 380px; margin: 0 auto; }
 
     #confetti-canvas {
@@ -155,6 +164,7 @@
       pointer-events: none;
       z-index: 0;
     }
+
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -172,32 +182,27 @@
   <canvas id="confetti-canvas"></canvas>
 
   <!-- Floating circles -->
-  <div class="petal" style="left:8%;  width:5px; height:5px; animation-duration:7s;  animation-delay:0s;"></div>
-  <div class="petal" style="left:22%; width:8px; height:8px; animation-duration:9s;  animation-delay:0s;"></div>
-  <div class="petal" style="left:38%; width:4px; height:4px; animation-duration:6s;  animation-delay:0s;"></div>
-  <div class="petal" style="left:55%; width:7px; height:7px; animation-duration:8s;  animation-delay:0s;"></div>
-  <div class="petal" style="left:70%; width:5px; height:5px; animation-duration:7s;  animation-delay:0s;"></div>
-  <div class="petal" style="left:85%; width:6px; height:6px; animation-duration:6s;  animation-delay:0s;"></div>
-  <div class="petal" style="left:15%; width:4px; height:4px; animation-duration:8s;  animation-delay:2s;"></div>
-  <div class="petal" style="left:48%; width:6px; height:6px; animation-duration:7s;  animation-delay:3s;"></div>
-  <div class="petal" style="left:92%; width:5px; height:5px; animation-duration:9s;  animation-delay:1s;"></div>
+  <div class="petal" style="left:8%;  width:5px; height:5px; animation-duration:7s; animation-delay:0s;"></div>
+  <div class="petal" style="left:22%; width:8px; height:8px; animation-duration:9s; animation-delay:0s;"></div>
+  <div class="petal" style="left:38%; width:4px; height:4px; animation-duration:6s; animation-delay:0s;"></div>
+  <div class="petal" style="left:55%; width:7px; height:7px; animation-duration:8s; animation-delay:0s;"></div>
+  <div class="petal" style="left:70%; width:5px; height:5px; animation-duration:7s; animation-delay:0s;"></div>
+  <div class="petal" style="left:85%; width:6px; height:6px; animation-duration:6s; animation-delay:0s;"></div>
+  <div class="petal" style="left:15%; width:4px; height:4px; animation-duration:8s; animation-delay:2s;"></div>
+  <div class="petal" style="left:48%; width:6px; height:6px; animation-duration:7s; animation-delay:3s;"></div>
+  <div class="petal" style="left:92%; width:5px; height:5px; animation-duration:9s; animation-delay:1s;"></div>
 
   <div class="container" id="question-section">
 
-    <!-- ✏️ EDIT: Small label -->
-    <!-- <p class="eyebrow">the big question</p> -->
-
-    <!-- ✏️ EDIT: The main question — keep <em> tags for italic styling -->
-    <!-- <h1>Will you go<br>on a <em>date</em> with me?</h1> -->
-
-    <!-- ✏️ EDIT: Subtext under the question -->
+    <!-- ✏️ EDIT: Subtext above the buttons -->
     <p class="sub">no pressure :)</p>
 
-    <div class="choices">
-      <!-- ✏️ EDIT: Button labels — heart removed from Yes -->
-      <button class="btn btn-yes" onclick="choose('yes')">Yes</button>
-      <button class="btn btn-no" onclick="choose('no')">No</button>
+    <div class="choices" id="choices-row">
+      <button class="btn btn-yes" id="btn-yes" onclick="chooseYes()">Yes</button>
     </div>
+
+    <!-- No button lives outside the flow so it can move freely -->
+    <button class="btn btn-no" id="btn-no" onclick="handleNo()">No</button>
 
     <div class="back-row">
       <a href="page3.html" class="btn btn-back">&larr; Back</a>
@@ -207,51 +212,130 @@
 
   <!-- ✏️ EDIT: YES response -->
   <div class="container response response-yes" id="response-yes">
-    <span class="response-icon">🌷</span>
+    <!-- yes.gif shows when they say yes -->
+    <img src="yes.gif" alt="" class="response-gif" />
     <h2>You just made me<br>the <em>happiest</em> person.</h2>
-    <!-- ✏️ EDIT: What to say after they say yes -->
-    <p>
-     let me know when you're free :)
-    </p>
+    <!-- ✏️ EDIT: Message after yes -->
+    <p>let me know when you're free :)</p>
   </div>
 
   <!-- ✏️ EDIT: NO response -->
   <div class="container response response-no" id="response-no">
-    <span class="response-icon">🌿</span>
+    <!-- no.gif shows when they say no 3 times -->
+    <img src="no.gif" alt="" class="response-gif" />
     <h2>That's okay.</h2>
-    <!-- ✏️ EDIT: What to say after they say no -->
-    <p>
-      that's okay too :)
-    </p>
+    <!-- ✏️ EDIT: Message after no -->
+    <p>that's okay too :)</p>
   </div>
 
   <script>
-    function choose(answer) {
-      document.getElementById('question-section').style.display = 'none';
-      if (answer === 'yes') {
-        document.getElementById('response-yes').classList.add('visible');
-        launchConfetti();
-      } else {
-        document.getElementById('response-no').classList.add('visible');
-      }
+    // ============================================================
+    // ✏️ EMAILJS SETUP — fill in these 3 values after you sign up
+    // at https://www.emailjs.com (it's free). See README for steps.
+    // ============================================================
+    const EMAILJS_PUBLIC_KEY  = "YOUR_PUBLIC_KEY";   // from EmailJS → Account
+    const EMAILJS_SERVICE_ID  = "YOUR_SERVICE_ID";   // from EmailJS → Email Services
+    const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";  // from EmailJS → Email Templates
+    // ============================================================
+
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+
+    let noPresses = 0;
+    const MAX_NO = 3; // after this many No clicks → show the No response
+
+    // Position the No button randomly on screen, avoiding edges
+    function placeNoBtn(btn) {
+      const margin = 80;
+      const maxX = window.innerWidth  - btn.offsetWidth  - margin;
+      const maxY = window.innerHeight - btn.offsetHeight - margin;
+      const x = margin + Math.random() * maxX;
+      const y = margin + Math.random() * maxY;
+      btn.style.left = x + "px";
+      btn.style.top  = y + "px";
     }
 
+    // Initialize the No button position once the page loads
+    window.addEventListener("load", () => {
+      const noBtn = document.getElementById("btn-no");
+      // Start it near the Yes button area
+      noBtn.style.left = "55%";
+      noBtn.style.top  = "50%";
+    });
+
+    function handleNo() {
+      noPresses++;
+      const noBtn  = document.getElementById("btn-no");
+      const yesBtn = document.getElementById("btn-yes");
+
+      if (noPresses >= MAX_NO) {
+        // 3rd no — accept it and show the no response
+        finishChoice("no");
+        return;
+      }
+
+      // Grow the Yes button a little each time
+      const yesScale = 1 + (noPresses * 0.18);
+      yesBtn.style.transform = `scale(${yesScale})`;
+
+      // Shrink & fade the No button slightly each time
+      const noScale   = Math.max(0.65, 1 - noPresses * 0.12);
+      const noOpacity = Math.max(0.45, 1 - noPresses * 0.18);
+      noBtn.style.fontSize = (0.85 * noScale) + "rem";
+      noBtn.style.opacity  = noOpacity;
+      noBtn.style.padding  = `${0.9 * noScale}rem ${2.8 * noScale}rem`;
+
+      // Jump to a new random spot
+      placeNoBtn(noBtn);
+    }
+
+    function chooseYes() {
+      finishChoice("yes");
+    }
+
+    function finishChoice(answer) {
+      // Hide No button and question
+      document.getElementById("btn-no").style.display = "none";
+      document.getElementById("question-section").style.display = "none";
+
+      if (answer === "yes") {
+        document.getElementById("response-yes").classList.add("visible");
+        launchConfetti();
+      } else {
+        document.getElementById("response-no").classList.add("visible");
+      }
+
+      // Send email notification
+      sendNotification(answer);
+    }
+
+    function sendNotification(answer) {
+      // Only try if the keys have been filled in
+      if (EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY") return;
+
+      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        answer: answer === "yes" ? "YES 🌷" : "No (after 3 tries)",
+        time:   new Date().toLocaleString(),
+        no_count: noPresses
+      }).catch(err => console.warn("EmailJS error:", err));
+    }
+
+    // Confetti
     function launchConfetti() {
-      const canvas = document.getElementById('confetti-canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
+      const canvas = document.getElementById("confetti-canvas");
+      const ctx    = canvas.getContext("2d");
+      canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
-      const colors = ['#e8b4a0','#c97d5e','#f5cfc3','#fdf6ee','#b5694a','#d4a090'];
-      const pieces = Array.from({length:120}, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * -canvas.height,
-        w: Math.random() * 8 + 4,
-        h: Math.random() * 4 + 2,
+      const colors = ["#e8b4a0","#c97d5e","#f5cfc3","#fdf6ee","#b5694a","#d4a090"];
+      const pieces = Array.from({length: 130}, () => ({
+        x:     Math.random() * canvas.width,
+        y:     Math.random() * -canvas.height,
+        w:     Math.random() * 8 + 4,
+        h:     Math.random() * 4 + 2,
         color: colors[Math.floor(Math.random() * colors.length)],
-        rot: Math.random() * 360,
+        rot:   Math.random() * 360,
         speed: Math.random() * 3 + 1.5,
         drift: Math.random() * 2 - 1,
-        spin: Math.random() * 4 - 2
+        spin:  Math.random() * 4 - 2
       }));
       let frame;
       function draw() {
