@@ -35,9 +35,8 @@
       pointer-events: none;
     }
 
-    /* Main card — everything stacks vertically inside this */
     .card {
-      max-width: 480px;
+      max-width: 520px;
       width: 100%;
       text-align: center;
       position: relative;
@@ -45,50 +44,28 @@
       animation: fadeUp 1s ease both;
     }
 
-    /* ✏️ EDIT: "no pressure" text */
     .sub {
       font-size: 0.9rem;
       color: var(--mid);
       margin-bottom: 2.5rem;
     }
 
-    /* The Yes button lives in normal flow, centered */
-    .yes-wrap {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 1.2rem;
-    }
-
-    .btn-yes {
-      padding: 0.9rem 2.8rem;
-      border-radius: 100px;
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      font-size: 0.85rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      cursor: pointer;
-      border: 1px solid var(--accent);
-      background: var(--accent);
-      color: #fff;
-      transition: transform 0.45s cubic-bezier(.34,1.56,.64,1), background 0.3s;
-      transform-origin: center;
-      white-space: nowrap;
-    }
-    .btn-yes:hover { background: #b5694a; border-color: #b5694a; }
-
     /*
-      The roaming zone: a fixed-height box where No bounces around.
-      No text or buttons live above this box, so nothing overlaps.
-      position: relative so No can be absolute inside it.
+      The roam zone holds BOTH buttons side by side.
+      It's tall enough that No can jump up/down without clipping,
+      and wide enough that they start centered.
+      Yes is absolutely positioned too so it never moves in the layout
+      but also never gets displaced — it just scales in place.
     */
     .roam-zone {
       position: relative;
       width: 100%;
-      height: 120px;   /* tall enough for No to move without clipping */
-      margin-bottom: 0.5rem;
+      height: 160px;
+      margin-bottom: 1rem;
     }
 
+    /* Shared pill style */
+    .btn-yes,
     .btn-no {
       position: absolute;
       padding: 0.9rem 2.8rem;
@@ -99,20 +76,32 @@
       letter-spacing: 0.15em;
       text-transform: uppercase;
       cursor: pointer;
-      border: 1px solid var(--blush);
-      background: transparent;
-      color: var(--mid);
       white-space: nowrap;
-      /* smooth jump + size changes */
-      transition: left 0.18s cubic-bezier(.25,.46,.45,.94),
-                  top  0.18s cubic-bezier(.25,.46,.45,.94),
+      border: 1px solid;
+    }
+
+    .btn-yes {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      transform-origin: center;
+      transition: transform 0.45s cubic-bezier(.34,1.56,.64,1), background 0.3s;
+    }
+    .btn-yes:hover { background: #b5694a; }
+
+    .btn-no {
+      background: transparent;
+      border-color: var(--blush);
+      color: var(--mid);
+      transition: left 0.2s cubic-bezier(.25,.46,.45,.94),
+                  top  0.2s cubic-bezier(.25,.46,.45,.94),
                   font-size 0.3s ease,
                   padding   0.3s ease,
                   opacity   0.3s ease;
     }
     .btn-no:hover { background: #f5e4da; }
 
-    .back-row { margin-top: 0.5rem; }
+    .back-row { margin-top: 0.25rem; }
     .btn-back {
       background: transparent;
       border: 1px solid transparent;
@@ -130,8 +119,13 @@
     }
     .btn-back:hover { border-color: var(--blush); color: var(--deep); }
 
-    /* Response screens */
-    .response { display: none; animation: fadeUp 0.8s ease both; text-align: center; max-width: 480px; width: 100%; }
+    .response {
+      display: none;
+      animation: fadeUp 0.8s ease both;
+      text-align: center;
+      max-width: 480px;
+      width: 100%;
+    }
     .response.visible { display: block; }
 
     .response-gif {
@@ -143,24 +137,13 @@
       display: block;
     }
 
-    .response-yes h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: clamp(2rem, 5vw, 3rem);
-      color: var(--deep);
-      margin-bottom: 0.8rem;
-    }
-    .response-yes h2 em { font-style: italic; color: var(--accent); }
-    .response-yes p { font-size: 0.95rem; color: var(--mid); line-height: 1.8; max-width: 380px; margin: 0 auto; }
-
-    .response-no h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: clamp(1.8rem, 4.5vw, 2.5rem);
+    .response-yes p, .response-no p {
+      font-size: 0.95rem;
       color: var(--mid);
-      margin-bottom: 0.8rem;
+      line-height: 1.8;
+      max-width: 380px;
+      margin: 0 auto;
     }
-    .response-no p { font-size: 0.9rem; color: var(--mid); line-height: 1.8; max-width: 380px; margin: 0 auto; }
 
     #confetti-canvas {
       position: fixed; top:0; left:0;
@@ -195,7 +178,6 @@
 
   <canvas id="confetti-canvas"></canvas>
 
-  <!-- Floating circles -->
   <div class="petal" style="left:8%;  width:5px; height:5px; animation-duration:7s; animation-delay:0s;"></div>
   <div class="petal" style="left:22%; width:8px; height:8px; animation-duration:9s; animation-delay:0s;"></div>
   <div class="petal" style="left:38%; width:4px; height:4px; animation-duration:6s; animation-delay:0s;"></div>
@@ -206,74 +188,80 @@
   <div class="petal" style="left:48%; width:6px; height:6px; animation-duration:7s; animation-delay:3s;"></div>
   <div class="petal" style="left:92%; width:5px; height:5px; animation-duration:9s; animation-delay:1s;"></div>
 
-  <!-- QUESTION SECTION -->
   <div class="card" id="question-section">
-
     <!-- ✏️ EDIT: Text above the buttons -->
     <p class="sub">no pressure :)</p>
 
-    <!-- YES stays in normal centered flow, never moves -->
-    <div class="yes-wrap">
-      <button class="btn-yes" id="btn-yes" onclick="chooseYes()">Yes</button>
-    </div>
-
-    <!-- Bounded roaming zone — No only ever lives inside this box -->
+    <!-- Both buttons live inside the roam zone, positioned by JS -->
     <div class="roam-zone" id="roam-zone">
-      <button class="btn-no" id="btn-no" onclick="handleNo()">No</button>
+      <button class="btn-yes" id="btn-yes" onclick="chooseYes()">Yes</button>
+      <button class="btn-no"  id="btn-no"  onclick="handleNo()">No</button>
     </div>
 
     <div class="back-row">
       <a href="page3.html" class="btn-back">&larr; Back</a>
     </div>
-
   </div>
 
-  <!-- YES RESPONSE -->
   <div class="response response-yes" id="response-yes">
     <img src="yes.gif" alt="" class="response-gif" />
-    <!-- <h2>You just made me<br>the <em>happiest</em> person.</h2> -->
     <!-- ✏️ EDIT: Message after yes -->
     <p>let me know when you're free :)</p>
   </div>
 
-  <!-- NO RESPONSE -->
   <div class="response response-no" id="response-no">
     <img src="no.gif" alt="" class="response-gif" />
-    <!-- <h2>That's okay.</h2> -->
     <!-- ✏️ EDIT: Message after no -->
     <p>that's okay too :)</p>
   </div>
 
   <script>
-    // ============================================================
-    // ✏️ EMAILJS SETUP — fill in these 3 values after signing up
-    // at https://www.emailjs.com (free). See README.txt for steps.
-    // ============================================================
+    // ✏️ YOUR EMAILJS KEYS
     const EMAILJS_PUBLIC_KEY  = "KgMT78Tq_FKDnPc22";
     const EMAILJS_SERVICE_ID  = "service_r4o1p14";
     const EMAILJS_TEMPLATE_ID = "template_g1yx5t8";
-    // ============================================================
 
     emailjs.init(EMAILJS_PUBLIC_KEY);
 
     let noPresses = 0;
     const MAX_NO  = 3;
 
-    const noBtn   = document.getElementById("btn-no");
     const yesBtn  = document.getElementById("btn-yes");
+    const noBtn   = document.getElementById("btn-no");
     const roamBox = document.getElementById("roam-zone");
 
-    // Place No button centered in the roam zone on load
-    function centerNoBtn() {
+    // Gap between the two buttons when side by side
+    const BTN_GAP = 16;
+
+    // Place both buttons centered & side-by-side horizontally,
+    // vertically centered in the roam zone.
+    function initButtons() {
       const zoneW = roamBox.offsetWidth;
       const zoneH = roamBox.offsetHeight;
-      const btnW  = noBtn.offsetWidth  || 110;
-      const btnH  = noBtn.offsetHeight || 44;
-      noBtn.style.left = ((zoneW - btnW) / 2) + "px";
-      noBtn.style.top  = ((zoneH - btnH) / 2) + "px";
+
+      const yesW = yesBtn.offsetWidth  || 110;
+      const yesH = yesBtn.offsetHeight || 44;
+      const noW  = noBtn.offsetWidth   || 90;
+      const noH  = noBtn.offsetHeight  || 44;
+
+      const totalW = yesW + BTN_GAP + noW;
+      const startX = (zoneW - totalW) / 2;
+      const midY   = (zoneH - Math.max(yesH, noH)) / 2;
+
+      // Yes on the left
+      yesBtn.style.left = startX + "px";
+      yesBtn.style.top  = midY + "px";
+
+      // No immediately to the right of Yes
+      noBtn.style.left = (startX + yesW + BTN_GAP) + "px";
+      noBtn.style.top  = midY + "px";
+
+      // Save Yes anchor so it never moves
+      yesBtn._anchorLeft = startX;
+      yesBtn._anchorTop  = midY;
     }
 
-    window.addEventListener("load", centerNoBtn);
+    window.addEventListener("load", initButtons);
 
     function handleNo() {
       noPresses++;
@@ -283,41 +271,46 @@
         return;
       }
 
-      // Grow Yes button a bit each click
+      // Grow Yes in place (transform keeps it at its anchor)
       const yesScale = 1 + noPresses * 0.22;
       yesBtn.style.transform = `scale(${yesScale})`;
 
-      // Shrink + fade No button slightly
+      // Shrink + fade No
       const noScale   = Math.max(0.62, 1 - noPresses * 0.15);
       const noOpacity = Math.max(0.42, 1 - noPresses * 0.2);
       noBtn.style.fontSize = (0.85 * noScale) + "rem";
       noBtn.style.padding  = `${0.9 * noScale}rem ${2.8 * noScale}rem`;
       noBtn.style.opacity  = noOpacity;
 
-      // Jump No to a random spot strictly inside the roam zone
-      // Use rAF so measurements are fresh after size change
+      // Jump No to a random spot in the roam zone, never overlapping Yes area
       requestAnimationFrame(() => {
         const zoneW = roamBox.offsetWidth;
         const zoneH = roamBox.offsetHeight;
-        const btnW  = noBtn.offsetWidth  || 90;
-        const btnH  = noBtn.offsetHeight || 40;
-        const pad   = 8; // small gap from zone edges
+        const noW   = noBtn.offsetWidth  || 80;
+        const noH   = noBtn.offsetHeight || 38;
+        const pad   = 8;
 
-        const maxX = zoneW - btnW - pad;
-        const maxY = zoneH - btnH - pad;
+        // Yes occupies roughly left half — keep No to the right of center
+        // so it never lands on top of Yes
+        const yesRight = (yesBtn._anchorLeft || 0) + (yesBtn.offsetWidth || 110) + BTN_GAP;
 
-        // Pick a spot that's at least 30% away from current pos so it feels like a real jump
+        const minX = Math.max(pad, yesRight - 20); // slight overlap allowed but not full cover
+        const maxX = zoneW - noW - pad;
+        const minY = pad;
+        const maxY = zoneH - noH - pad;
+
         let x, y, tries = 0;
         const curX = parseFloat(noBtn.style.left) || 0;
         const curY = parseFloat(noBtn.style.top)  || 0;
+
         do {
-          x = pad + Math.random() * Math.max(0, maxX - pad);
-          y = pad + Math.random() * Math.max(0, maxY - pad);
+          x = minX + Math.random() * Math.max(0, maxX - minX);
+          y = minY + Math.random() * Math.max(0, maxY - minY);
           tries++;
         } while (
-          tries < 20 &&
-          Math.abs(x - curX) < zoneW * 0.25 &&
-          Math.abs(y - curY) < zoneH * 0.25
+          tries < 25 &&
+          Math.abs(x - curX) < zoneW * 0.2 &&
+          Math.abs(y - curY) < zoneH * 0.2
         );
 
         noBtn.style.left = x + "px";
@@ -331,19 +324,16 @@
 
     function finishChoice(answer) {
       document.getElementById("question-section").style.display = "none";
-
       if (answer === "yes") {
         document.getElementById("response-yes").classList.add("visible");
         launchConfetti();
       } else {
         document.getElementById("response-no").classList.add("visible");
       }
-
       sendNotification(answer);
     }
 
     function sendNotification(answer) {
-      if (EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY") return;
       emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
         answer:   answer === "yes" ? "YES 🌷" : "No (after 3 tries)",
         time:     new Date().toLocaleString(),
