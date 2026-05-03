@@ -336,7 +336,7 @@
 
     function sendNotification(answer) {
       emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        answer:   answer === "yes" ? "YES 🌷" : "No (after 3 tries)",
+        answer:   answer === "yes" ? "YES" : "No (after 3 tries)",
         time:     new Date().toLocaleString(),
         no_count: noPresses
       }).catch(err => console.warn("EmailJS error:", err));
