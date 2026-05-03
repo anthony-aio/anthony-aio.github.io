@@ -224,8 +224,7 @@
     emailjs.init(EMAILJS_PUBLIC_KEY);
 
     let noPresses = 0;
-    // Random threshold between 3 and 7 — different every time the page loads
-    const MAX_NO  = Math.floor(Math.random() * 5) + 3;
+    const MAX_NO  = 3;
 
     const yesBtn  = document.getElementById("btn-yes");
     const noBtn   = document.getElementById("btn-no");
@@ -272,17 +271,16 @@
         return;
       }
 
-      // Only grow Yes and shrink No for the first 3 clicks — after that just keep jumping
-      if (noPresses <= 3) {
-        const yesScale = 1 + noPresses * 0.22;
-        yesBtn.style.transform = `scale(${yesScale})`;
+      // Grow Yes in place (transform keeps it at its anchor)
+      const yesScale = 1 + noPresses * 0.22;
+      yesBtn.style.transform = `scale(${yesScale})`;
 
-        const noScale   = Math.max(0.62, 1 - noPresses * 0.15);
-        const noOpacity = Math.max(0.42, 1 - noPresses * 0.2);
-        noBtn.style.fontSize = (0.85 * noScale) + "rem";
-        noBtn.style.padding  = `${0.9 * noScale}rem ${2.8 * noScale}rem`;
-        noBtn.style.opacity  = noOpacity;
-      }
+      // Shrink + fade No
+      const noScale   = Math.max(0.62, 1 - noPresses * 0.15);
+      const noOpacity = Math.max(0.42, 1 - noPresses * 0.2);
+      noBtn.style.fontSize = (0.85 * noScale) + "rem";
+      noBtn.style.padding  = `${0.9 * noScale}rem ${2.8 * noScale}rem`;
+      noBtn.style.opacity  = noOpacity;
 
       // Jump No to a random spot in the roam zone, never overlapping Yes area
       requestAnimationFrame(() => {
