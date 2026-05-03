@@ -1,395 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Question</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --cream:#fdf6ee; --blush:#e8b4a0; --deep:#2c1a12; --mid:#7a4f3a; --accent:#c97d5e; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Question</title>
 
-    body {
-      background-color: var(--cream);
-      color: var(--deep);
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 3rem 2rem;
-      position: relative;
-      overflow: hidden;
-    }
+<style>
+:root {
+  --accent:#c97d5e;
+  --blush:#e8b4a0;
+  --mid:#7a4f3a;
+}
 
-    body::before {
-      content: '';
-      position: fixed;
-      bottom: -200px; left: -200px;
-      width: 600px; height: 600px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(232,180,160,0.2) 0%, transparent 70%);
-      pointer-events: none;
-    }
+/* Layout */
+body {
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:sans-serif;
+}
 
-    /* Main card — everything stacks vertically inside this */
-    .card {
-      max-width: 480px;
-      width: 100%;
-      text-align: center;
-      position: relative;
-      z-index: 1;
-      animation: fadeUp 1s ease both;
-    }
+/* Row holding both buttons */
+.button-row {
+  display:flex;
+  gap:16px;
+  justify-content:center;
+  align-items:center;
+}
 
-    /* ✏️ EDIT: "no pressure" text */
-    .sub {
-      font-size: 0.9rem;
-      color: var(--mid);
-      margin-bottom: 2.5rem;
-    }
+/* Shared button sizing (THIS makes them identical) */
+.btn-yes,
+.btn-no {
+  width:140px;
+  height:50px;
+  border-radius:100px;
+  font-size:14px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  cursor:pointer;
+}
 
-    /* The Yes button lives in normal flow, centered */
-    .yes-wrap {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 1.2rem;
-    }
+/* YES */
+.btn-yes {
+  background:var(--accent);
+  color:white;
+  border:none;
+}
 
-    .btn-yes {
-      padding: 0.9rem 2.8rem;
-      border-radius: 100px;
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      font-size: 0.85rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      cursor: pointer;
-      border: 1px solid var(--accent);
-      background: var(--accent);
-      color: #fff;
-      transition: transform 0.45s cubic-bezier(.34,1.56,.64,1), background 0.3s;
-      transform-origin: center;
-      white-space: nowrap;
-    }
-    .btn-yes:hover { background: #b5694a; border-color: #b5694a; }
+/* NO container (same size as YES so it's symmetrical) */
+.roam-zone {
+  position:relative;
+  width:140px;
+  height:50px;
+}
 
-    /*
-      The roaming zone: a fixed-height box where No bounces around.
-      No text or buttons live above this box, so nothing overlaps.
-      position: relative so No can be absolute inside it.
-    */
-    .roam-zone {
-      position: relative;
-      width: 100%;
-      height: 120px;   /* tall enough for No to move without clipping */
-      margin-bottom: 0.5rem;
-    }
-
-    .btn-no {
-      position: absolute;
-      padding: 0.9rem 2.8rem;
-      border-radius: 100px;
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      font-size: 0.85rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      cursor: pointer;
-      border: 1px solid var(--blush);
-      background: transparent;
-      color: var(--mid);
-      white-space: nowrap;
-      /* smooth jump + size changes */
-      transition: left 0.18s cubic-bezier(.25,.46,.45,.94),
-                  top  0.18s cubic-bezier(.25,.46,.45,.94),
-                  font-size 0.3s ease,
-                  padding   0.3s ease,
-                  opacity   0.3s ease;
-    }
-    .btn-no:hover { background: #f5e4da; }
-
-    .back-row { margin-top: 0.5rem; }
-    .btn-back {
-      background: transparent;
-      border: 1px solid transparent;
-      color: var(--mid);
-      font-size: 0.75rem;
-      padding: 0.6rem 1.5rem;
-      cursor: pointer;
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      border-radius: 100px;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .btn-back:hover { border-color: var(--blush); color: var(--deep); }
-
-    /* Response screens */
-    .response { display: none; animation: fadeUp 0.8s ease both; text-align: center; max-width: 480px; width: 100%; }
-    .response.visible { display: block; }
-
-    .response-gif {
-      width: 200px;
-      height: 200px;
-      object-fit: cover;
-      border-radius: 20px;
-      margin: 0 auto 1.5rem;
-      display: block;
-    }
-
-    .response-yes h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: clamp(2rem, 5vw, 3rem);
-      color: var(--deep);
-      margin-bottom: 0.8rem;
-    }
-    .response-yes h2 em { font-style: italic; color: var(--accent); }
-    .response-yes p { font-size: 0.95rem; color: var(--mid); line-height: 1.8; max-width: 380px; margin: 0 auto; }
-
-    .response-no h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: clamp(1.8rem, 4.5vw, 2.5rem);
-      color: var(--mid);
-      margin-bottom: 0.8rem;
-    }
-    .response-no p { font-size: 0.9rem; color: var(--mid); line-height: 1.8; max-width: 380px; margin: 0 auto; }
-
-    #confetti-canvas {
-      position: fixed; top:0; left:0;
-      width:100%; height:100%;
-      pointer-events: none;
-      z-index: 999;
-    }
-
-    .petal {
-      position: fixed;
-      border-radius: 50%;
-      background: var(--blush);
-      opacity: 0;
-      animation: float linear infinite;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes float {
-      0%   { transform: translateY(100vh); opacity: 0; }
-      8%   { opacity: 0.45; }
-      92%  { opacity: 0.45; }
-      100% { transform: translateY(-10vh); opacity: 0; }
-    }
-  </style>
+/* NO button */
+.btn-no {
+  position:absolute;
+  left:0;
+  top:0;
+  background:transparent;
+  border:1px solid var(--blush);
+  color:var(--mid);
+}
+</style>
 </head>
+
 <body>
 
-  <canvas id="confetti-canvas"></canvas>
+<div class="button-row">
+  <button class="btn-yes" id="btn-yes" onclick="chooseYes()">Yes</button>
 
-  <!-- Floating circles -->
-  <div class="petal" style="left:8%;  width:5px; height:5px; animation-duration:7s; animation-delay:0s;"></div>
-  <div class="petal" style="left:22%; width:8px; height:8px; animation-duration:9s; animation-delay:0s;"></div>
-  <div class="petal" style="left:38%; width:4px; height:4px; animation-duration:6s; animation-delay:0s;"></div>
-  <div class="petal" style="left:55%; width:7px; height:7px; animation-duration:8s; animation-delay:0s;"></div>
-  <div class="petal" style="left:70%; width:5px; height:5px; animation-duration:7s; animation-delay:0s;"></div>
-  <div class="petal" style="left:85%; width:6px; height:6px; animation-duration:6s; animation-delay:0s;"></div>
-  <div class="petal" style="left:15%; width:4px; height:4px; animation-duration:8s; animation-delay:2s;"></div>
-  <div class="petal" style="left:48%; width:6px; height:6px; animation-duration:7s; animation-delay:3s;"></div>
-  <div class="petal" style="left:92%; width:5px; height:5px; animation-duration:9s; animation-delay:1s;"></div>
-
-  <!-- QUESTION SECTION -->
-  <div class="card" id="question-section">
-
-    <!-- ✏️ EDIT: Text above the buttons -->
-    <p class="sub">no pressure :)</p>
-
-    <!-- YES stays in normal centered flow, never moves -->
-    <div class="yes-wrap">
-      <button class="btn-yes" id="btn-yes" onclick="chooseYes()">Yes</button>
-    </div>
-
-    <!-- Bounded roaming zone — No only ever lives inside this box -->
-    <div class="roam-zone" id="roam-zone">
-      <button class="btn-no" id="btn-no" onclick="handleNo()">No</button>
-    </div>
-
-    <div class="back-row">
-      <a href="page3.html" class="btn-back">&larr; Back</a>
-    </div>
-
+  <div class="roam-zone" id="roam-zone">
+    <button class="btn-no" id="btn-no" onclick="handleNo()">No</button>
   </div>
+</div>
 
-  <!-- YES RESPONSE -->
-  <div class="response response-yes" id="response-yes">
-    <img src="yes.gif" alt="" class="response-gif" />
-    <!-- <h2>You just made me<br>the <em>happiest</em> person.</h2> -->
-    <!-- ✏️ EDIT: Message after yes -->
-    <p>let me know when you're free :)</p>
-  </div>
+<script>
+let noPresses = 0;
 
-  <!-- NO RESPONSE -->
-  <div class="response response-no" id="response-no">
-    <img src="no.gif" alt="" class="response-gif" />
-    <!-- <h2>That's okay.</h2> -->
-    <!-- ✏️ EDIT: Message after no -->
-    <p>that's okay too :)</p>
-  </div>
+const noBtn = document.getElementById("btn-no");
+const yesBtn = document.getElementById("btn-yes");
+const roamBox = document.getElementById("roam-zone");
 
-  <script>
-    // ============================================================
-    // ✏️ EMAILJS SETUP — fill in these 3 values after signing up
-    // at https://www.emailjs.com (free). See README.txt for steps.
-    // ============================================================
-    const EMAILJS_PUBLIC_KEY  = "YOUR_PUBLIC_KEY";
-    const EMAILJS_SERVICE_ID  = "YOUR_SERVICE_ID";
-    const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
-    // ============================================================
+/* Start perfectly aligned */
+function centerNoBtn() {
+  noBtn.style.left = "0px";
+  noBtn.style.top = "0px";
+}
 
-    emailjs.init(EMAILJS_PUBLIC_KEY);
+window.onload = centerNoBtn;
 
-    let noPresses = 0;
-    const MAX_NO  = 3;
+function handleNo() {
+  noPresses++;
 
-    const noBtn   = document.getElementById("btn-no");
-    const yesBtn  = document.getElementById("btn-yes");
-    const roamBox = document.getElementById("roam-zone");
+  /* grow yes */
+  yesBtn.style.transform = `scale(${1 + noPresses * 0.2})`;
 
-    // Place No button centered in the roam zone on load
-    function centerNoBtn() {
-      const zoneW = roamBox.offsetWidth;
-      const zoneH = roamBox.offsetHeight;
-      const btnW  = noBtn.offsetWidth  || 110;
-      const btnH  = noBtn.offsetHeight || 44;
-      noBtn.style.left = ((zoneW - btnW) / 2) + "px";
-      noBtn.style.top  = ((zoneH - btnH) / 2) + "px";
-    }
+  /* move no randomly */
+  const zoneW = roamBox.offsetWidth;
+  const zoneH = roamBox.offsetHeight;
 
-    window.addEventListener("load", centerNoBtn);
+  const maxX = zoneW - noBtn.offsetWidth;
+  const maxY = zoneH - noBtn.offsetHeight;
 
-    function handleNo() {
-      noPresses++;
+  const x = Math.random() * maxX;
+  const y = Math.random() * maxY;
 
-      if (noPresses >= MAX_NO) {
-        finishChoice("no");
-        return;
-      }
+  noBtn.style.left = x + "px";
+  noBtn.style.top = y + "px";
+}
 
-      // Grow Yes button a bit each click
-      const yesScale = 1 + noPresses * 0.22;
-      yesBtn.style.transform = `scale(${yesScale})`;
-
-      // Shrink + fade No button slightly
-      const noScale   = Math.max(0.62, 1 - noPresses * 0.15);
-      const noOpacity = Math.max(0.42, 1 - noPresses * 0.2);
-      noBtn.style.fontSize = (0.85 * noScale) + "rem";
-      noBtn.style.padding  = `${0.9 * noScale}rem ${2.8 * noScale}rem`;
-      noBtn.style.opacity  = noOpacity;
-
-      // Jump No to a random spot strictly inside the roam zone
-      // Use rAF so measurements are fresh after size change
-      requestAnimationFrame(() => {
-        const zoneW = roamBox.offsetWidth;
-        const zoneH = roamBox.offsetHeight;
-        const btnW  = noBtn.offsetWidth  || 90;
-        const btnH  = noBtn.offsetHeight || 40;
-        const pad   = 8; // small gap from zone edges
-
-        const maxX = zoneW - btnW - pad;
-        const maxY = zoneH - btnH - pad;
-
-        // Pick a spot that's at least 30% away from current pos so it feels like a real jump
-        let x, y, tries = 0;
-        const curX = parseFloat(noBtn.style.left) || 0;
-        const curY = parseFloat(noBtn.style.top)  || 0;
-        do {
-          x = pad + Math.random() * Math.max(0, maxX - pad);
-          y = pad + Math.random() * Math.max(0, maxY - pad);
-          tries++;
-        } while (
-          tries < 20 &&
-          Math.abs(x - curX) < zoneW * 0.25 &&
-          Math.abs(y - curY) < zoneH * 0.25
-        );
-
-        noBtn.style.left = x + "px";
-        noBtn.style.top  = y + "px";
-      });
-    }
-
-    function chooseYes() {
-      finishChoice("yes");
-    }
-
-    function finishChoice(answer) {
-      document.getElementById("question-section").style.display = "none";
-
-      if (answer === "yes") {
-        document.getElementById("response-yes").classList.add("visible");
-        launchConfetti();
-      } else {
-        document.getElementById("response-no").classList.add("visible");
-      }
-
-      sendNotification(answer);
-    }
-
-    function sendNotification(answer) {
-      if (EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY") return;
-      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        answer:   answer === "yes" ? "YES 🌷" : "No (after 3 tries)",
-        time:     new Date().toLocaleString(),
-        no_count: noPresses
-      }).catch(err => console.warn("EmailJS error:", err));
-    }
-
-    function launchConfetti() {
-      const canvas = document.getElementById("confetti-canvas");
-      const ctx    = canvas.getContext("2d");
-      canvas.width  = window.innerWidth;
-      canvas.height = window.innerHeight;
-      const colors  = ["#e8b4a0","#c97d5e","#f5cfc3","#fdf6ee","#b5694a","#d4a090"];
-      const pieces  = Array.from({length: 130}, () => ({
-        x:     Math.random() * canvas.width,
-        y:     Math.random() * -canvas.height,
-        w:     Math.random() * 8 + 4,
-        h:     Math.random() * 4 + 2,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        rot:   Math.random() * 360,
-        speed: Math.random() * 3 + 1.5,
-        drift: Math.random() * 2 - 1,
-        spin:  Math.random() * 4 - 2
-      }));
-      let frame;
-      function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        pieces.forEach(p => {
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rot * Math.PI / 180);
-          ctx.fillStyle = p.color;
-          ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-          ctx.restore();
-          p.y += p.speed; p.x += p.drift; p.rot += p.spin;
-        });
-        if (pieces.some(p => p.y < canvas.height + 20)) {
-          frame = requestAnimationFrame(draw);
-        } else {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-      }
-      draw();
-      setTimeout(() => { cancelAnimationFrame(frame); ctx.clearRect(0,0,canvas.width,canvas.height); }, 5000);
-    }
-  </script>
+function chooseYes() {
+  alert("YES selected");
+}
+</script>
 
 </body>
 </html>
